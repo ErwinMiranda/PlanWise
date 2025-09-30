@@ -238,6 +238,59 @@
           transform: translateX(0); /* visible */
         }
       }
+      /* ---------- Dropdown ---------- */
+      .dropdown {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .dropdown-toggle {
+        text-decoration: none;
+        color: inherit;
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      .dropdown-toggle:hover {
+        background: var(--accent);
+        color: #fff;
+        transform: translateX(6px);
+      }
+
+      .dropdown-menu {
+        display: none;
+        flex-direction: column;
+        padding-left: 12px; /* indent child links */
+        margin-top: 4px;
+      }
+
+      .dropdown-menu a {
+        font-size: 14px;
+        padding: 8px 14px;
+        border-radius: 6px;
+      }
+
+      .dropdown-menu a:hover {
+        background: var(--accent);
+        color: #fff;
+        transform: translateX(6px);
+      }
+
+      .dropdown.open .dropdown-menu {
+        display: flex;
+      }
+      .sidebar a.active {
+        background-color: var(--accent);
+        color: #fff7f7;
+      }
+
+      .sidebar a.parent-active {
+        background-color: var(--accent);
+        color: #fff7f7;
+      }
     </style>
   </head>
   <body>
@@ -294,6 +347,30 @@
           data-src="https://app.powerbi.com/view?r=eyJrIjoiNmY0NDMyZjAtNDNlOS00MzdiLWI4N2ItZTU2OWM3MTkzZjg3IiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
           >RNR</a
         >
+        <!-- Manhours Dropdown -->
+        <div class="dropdown">
+          <a href="#" class="dropdown-toggle">MHrs</a>
+          <div class="dropdown-menu">
+            <a
+              href="#"
+              class="report-link"
+              data-src="https://app.powerbi.com/view?r=eyJrIjoiNWYzYWNmNDEtZDU3ZS00MDI1LTk2MzItYmY4NGJhMTUxNmRlIiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+              >EK MH</a
+            >
+            <a
+              href="#"
+              class="report-link"
+              data-src="https://app.powerbi.com/view?r=eyJrIjoiMmM1MjEwZGUtNzYzOC00YmRkLTllNGYtM2VkMmU5N2Y5MWMxIiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+              >BA MH</a
+            >
+            <a
+              href="#"
+              class="report-link"
+              data-src="https://app.powerbi.com/view?r=eyJrIjoiZDA2Mjk5ZTUtMTdkOC00ZmQ2LTg2MjctZDdmNDkxZjQzZjMzIiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+              >LH MH</a
+            >
+          </div>
+        </div>
       </nav>
     </aside>
 
@@ -377,6 +454,54 @@
 
           reportContainer.appendChild(iframe);
           reportContainer.scrollIntoView({ behavior: "smooth" });
+        });
+      });
+      // Dropdown toggle logic with accordion effect
+      const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
+
+      dropdownToggles.forEach((toggle) => {
+        toggle.addEventListener("click", (e) => {
+          e.preventDefault();
+          const parent = toggle.parentElement;
+
+          // Close other open dropdowns
+          document
+            .querySelectorAll(".dropdown.open")
+            .forEach((openDropdown) => {
+              if (openDropdown !== parent) {
+                openDropdown.classList.remove("open");
+              }
+            });
+
+          // Toggle clicked one
+          parent.classList.toggle("open");
+        });
+      });
+
+      // Collapse dropdowns when clicking any report link
+      reportLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+          // Collapse all dropdowns
+          document
+            .querySelectorAll(".dropdown.open")
+            .forEach((openDropdown) => {
+              openDropdown.classList.remove("open");
+            });
+
+          // Check if this link belongs to a dropdown
+          const parentDropdown = link.closest(".dropdown");
+          const parentToggle =
+            parentDropdown?.querySelector(".dropdown-toggle");
+
+          // Remove highlight from all dropdown-toggles
+          document.querySelectorAll(".dropdown-toggle").forEach((btn) => {
+            btn.classList.remove("parent-active");
+          });
+
+          // Keep the parent highlighted if inside dropdown
+          if (parentToggle) {
+            parentToggle.classList.add("parent-active");
+          }
         });
       });
     </script>
