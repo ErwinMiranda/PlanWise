@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Production Planning and Support</title>
+    <style>
+      :root {
+        --bg-light: #f9fafb;
+        --bg-dark: #111827;
+        --sidebar-light: #ffffff;
+        --sidebar-dark: #1f2937;
+        --text-light: #1f2937;
+        --text-dark: #f9fafb;
+        --accent: #09a0b4;
+        --accent-hover: #09183f;
+        --muted: #6b7280;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg-light);
+        color: var(--text-light);
+        font-family: "Inter", sans-serif;
+        display: flex;
+        overflow-x: hidden;
+        transition: background 0.4s ease, color 0.4s ease;
+      }
+      body.dark {
+        background: var(--bg-dark);
+        color: var(--text-dark);
+      }
+
+      /* ---------- Animated Background ---------- */
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        z-index: -1;
+        background: radial-gradient(
+            circle at 30% 30%,
+            rgba(122, 123, 124, 0.384),
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at 70% 70%,
+            rgba(91, 91, 92, 0.13),
+            transparent 60%
+          );
+        animation: moveWaves 20s linear infinite;
+      }
+      body.dark::before,
+      body.dark::after {
+        background: radial-gradient(
+            circle at 30% 30%,
+            rgba(4, 30, 85, 0.658),
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at 70% 70%,
+            rgba(230, 12, 48, 0.15),
+            transparent 60%
+          );
+      }
+      body::after {
+        animation-direction: reverse;
+        opacity: 0.7;
+      }
+      @keyframes moveWaves {
+        0% {
+          transform: rotate(0deg) scale(1);
+        }
+        50% {
+          transform: rotate(180deg) scale(1.2);
+        }
+        100% {
+          transform: rotate(360deg) scale(1);
+        }
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar {
+        width: 240px;
+        background: var(--sidebar-light);
+        padding: 28px 20px;
+        display: flex;
+        flex-direction: column;
+        transition: width 0.4s ease, padding 0.4s ease, transform 0.4s ease,
+          background 0.4s ease;
+        z-index: 2000;
+        flex-shrink: 0;
+      }
+      body.dark .sidebar {
+        background: var(--sidebar-dark);
+      }
+      .sidebar.collapsed {
+        width: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .sidebar .logo {
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .nav a {
+        text-decoration: none;
+        color: inherit;
+        padding: 12px 14px;
+        border-radius: 8px;
+        transition: background 0.3s ease, transform 0.2s ease;
+        font-weight: 500;
+      }
+      .nav a:hover {
+        background: var(--accent);
+        color: #fff;
+        transform: translateX(6px);
+      }
+      .nav a.active {
+        background: var(--accent);
+        color: #fff;
+        transform: translateX(6px);
+      }
+
+      /* ---------- Main Content ---------- */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        margin-left: 0px;
+        transition: margin-left 0.9s ease;
+        height: 100vh;
+      }
+
+      .report-container {
+        width: 100%;
+        height: 100%; /* fill main height */
+        display: none; /* hidden until a report is clicked */
+      }
+
+      .main.collapsed {
+        margin-left: 0;
+      }
+
+      header {
+        backdrop-filter: blur(12px);
+        background: linear-gradient(270deg, var(--accent), var(--accent-hover));
+        background-size: 400% 400%;
+        color: #fff;
+        padding: 16px 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: gradientShift 8s ease infinite;
+      }
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .toggle-btn,
+      .menu-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #fff;
+        z-index: 3000;
+        position: relative;
+      }
+      .menu-btn {
+        font-size: 22px;
+      }
+
+      .title {
+        padding: 40px 24px 20px;
+        animation: fadeInUp 1s ease;
+        backdrop-filter: blur(6px);
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .title h2 {
+        font-size: 16px;
+        font-weight: 400;
+        color: var(--muted);
+      }
+      .title h1 {
+        font-size: 30px;
+        font-weight: 700;
+        margin: 6px 0;
+      }
+      .title h3 {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.7;
+      }
+
+      /* ---------- Responsive ---------- */
+      @media (max-width: 768px) {
+        .main {
+          margin-left: 0;
+        }
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          transform: translateX(-100%);
+        }
+        .sidebar.collapsed {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">Lufthansa Technik Philippines</div>
+      <nav class="nav">
+        <a href="">Home</a>
+        <a
+          href="https://apps.powerapps.com/play/e/default-8c09b36f-1cd8-4669-856e-1f79d5e305da/a/bfa53a11-e163-485e-a502-03cd8ec90cd4?tenantId=8c09b36f-1cd8-4669-856e-1f79d5e305da&hint=62207e21-bf5c-4a7c-abe0-7ae4997f916d&sourcetime=1745377620786"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Layover Manager</a
+        >
+        <a
+          href="#"
+          class="report-link"
+          data-src="https://app.powerbi.com/view?r=eyJrIjoiYmU5ZGMzYTItZTBhYi00NTg5LTkxYWItOTA4ZTEyMTYyMDJiIiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+          >New PED</a
+        >
+        <a
+          href="#"
+          class="report-link"
+          data-src="https://app.powerbi.com/view?r=eyJrIjoiMmZiODQwYWItZjAwZS00NzE4LWIyYmYtNzM3YzE4MDdhNjljIiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+          >Layover Preparation</a
+        >
+        <a
+          href="#"
+          class="report-link"
+          data-src="https://app.powerbi.com/view?r=eyJrIjoiOWZkZjJhNDAtNzQ4Yi00ZDMwLTk2ZDYtNDgwOTNmYWI1MmQwIiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+          >BM Capacity</a
+        >
+        <a
+          href="#"
+          class="report-link"
+          data-src="https://app.powerbi.com/view?r=eyJrIjoiMjRlZDg1ZWUtNGQ1YS00ODFhLThiMWUtZTA0OTkwYWNkM2EwIiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+          >Print Sync</a
+        >
+        <a
+          href="ms-excel:ofe|u|https://ltpsystems.sharepoint.com/sites/BaseMaintenance/Shared Documents/MGR/PR/PlanSharev2.2.xlsm"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Plan Share</a
+        >
+        <a
+          href="#"
+          class="report-link"
+          data-src="https://app.powerbi.com/view?r=eyJrIjoiMzAwZWI3NTYtZTU1Yi00NThkLWFkMjEtZTVmY2E5NzlmOGM5IiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+          >PINS</a
+        >
+        <a
+          href="#"
+          class="report-link"
+          data-src="https://app.powerbi.com/view?r=eyJrIjoiNmY0NDMyZjAtNDNlOS00MzdiLWI4N2ItZTU2OWM3MTkzZjg3IiwidCI6IjhjMDliMzZmLTFjZDgtNDY2OS04NTZlLTFmNzlkNWUzMDVkYSIsImMiOjEwfQ%3D%3D"
+          >RNR</a
+        >
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <header>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <button class="menu-btn" id="menuBtn">☰</button>
+          <div>Production Planning & Support</div>
+        </div>
+        <button class="toggle-btn" id="themeToggle">🌙</button>
+      </header>
+
+      <div class="report-container" id="reportContainer">
+        <!-- Report iframe will appear here -->
+      </div>
+
+      <div class="title" id="welcomeSection">
+        <h2>Welcome To</h2>
+        <h1>Production Planning and Support</h1>
+        <h3>Reports Dashboard</h3>
+      </div>
+    </div>
+
+    <script>
+      const toggleBtn = document.getElementById("themeToggle");
+      const body = document.body;
+      const sidebar = document.getElementById("sidebar");
+      const menuBtn = document.getElementById("menuBtn");
+      const main = document.querySelector(".main");
+      const reportLinks = document.querySelectorAll(".report-link");
+      const reportContainer = document.getElementById("reportContainer");
+
+      // Load saved theme
+      if (localStorage.getItem("theme") === "dark") {
+        body.classList.add("dark");
+        toggleBtn.textContent = "☀️";
+      }
+
+      toggleBtn.addEventListener("click", () => {
+        body.classList.toggle("dark");
+        toggleBtn.textContent = body.classList.contains("dark") ? "☀️" : "🌙";
+        localStorage.setItem(
+          "theme",
+          body.classList.contains("dark") ? "dark" : "light"
+        );
+      });
+
+      // Menu button toggles sidebar
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle("collapsed");
+        main.classList.toggle("collapsed");
+      });
+
+      // Click main area hides sidebar
+      main.addEventListener("click", () => {
+        sidebar.classList.add("collapsed");
+        main.classList.add("collapsed");
+      });
+
+      // Load report dynamically
+      const welcomeSection = document.getElementById("welcomeSection");
+
+      reportLinks.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          reportLinks.forEach((l) => l.classList.remove("active"));
+          link.classList.add("active");
+
+          // Hide welcome section
+          welcomeSection.style.display = "none";
+
+          // Show report container
+          reportContainer.style.display = "block";
+          reportContainer.innerHTML = "";
+
+          const iframe = document.createElement("iframe");
+          iframe.src = link.dataset.src; // make sure report layout is Fit to Width
+          iframe.style.width = "100%";
+          iframe.style.height = "100%"; // fill container
+          iframe.style.border = "0";
+          iframe.allowFullscreen = true;
+
+          reportContainer.appendChild(iframe);
+          reportContainer.scrollIntoView({ behavior: "smooth" });
+        });
+      });
+    </script>
+  </body>
+</html>
