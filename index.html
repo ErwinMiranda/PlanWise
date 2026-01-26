@@ -486,27 +486,34 @@
       reportLinks.forEach((link) => {
         link.addEventListener("click", (e) => {
           e.preventDefault();
+
           reportLinks.forEach((l) => l.classList.remove("active"));
           link.classList.add("active");
 
-          // Hide welcome section
+          // Hide welcome
           welcomeSection.style.display = "none";
 
-          // Show report container
+          // Show report
           reportContainer.style.display = "block";
           reportContainer.innerHTML = "";
 
           const iframe = document.createElement("iframe");
-          iframe.src = link.dataset.src; // make sure report layout is Fit to Width
+          iframe.src = link.dataset.src;
           iframe.style.width = "100%";
-          iframe.style.height = "100%"; // fill container
+          iframe.style.height = "100%";
           iframe.style.border = "0";
           iframe.allowFullscreen = true;
 
           reportContainer.appendChild(iframe);
           reportContainer.scrollIntoView({ behavior: "smooth" });
+
+          // ✅ AUTO-HIDE SIDEBAR ON SMALL DEVICES
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("show");
+          }
         });
       });
+
       // Dropdown toggle logic with accordion effect
       const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
 
